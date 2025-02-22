@@ -1,0 +1,33 @@
+name: Update MITRE ATT&CK Data
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Exécute tous les jours à minuit UTC
+  workflow_dispatch:  # Permet d'exécuter manuellement
+
+jobs:
+  update_attack_data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install pandas requests openpyxl
+
+      - name: Run Python script to update data
+        run: python scripts/update_attack_data.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add data/
+          git commit -m "🔄 Mise à jour automatique des données MITRE ATT&CK en Excel" || echo "Aucune mise à jour"
+          git push
